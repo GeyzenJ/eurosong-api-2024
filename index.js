@@ -17,6 +17,19 @@ app.get('/api/artists', (req, res) => {
     });
 });
 
+//ranking song_id, totaal punten, artiestNaam, songNaam
+app.get('/api/ranking', (req, res) => {
+    const db = new Database();
+    db.getQuery(`SELECT s.song_id, s.name AS song_name, sum(vs.points) as points, a.name AS artist_name
+                FROM votes AS vs
+                INNER JOIN songs AS s ON vs.song_id = s.song_id
+                INNER JOIN artists AS a ON s.artist_id = a.artist_id
+                GROUP BY s.song_id 
+                ORDER BY sum(vs.points) DESC;`).then((ranking) => {
+        res.send(ranking);
+    });
+});
+
 app.get('/api/songs', (req, res) => {
     const db = new Database();
     db.getQuery(`SELECT song_id, s.name  as songname, a.name as artistname
